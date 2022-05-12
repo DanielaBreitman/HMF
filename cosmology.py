@@ -143,6 +143,42 @@ class Cosmology:
             return self.g_z(OMm_z) / self.g_z(self.OM_m) / (1.0 + z);
         else:
             raise ValueError("ERROR: no growth function for this cosmology! returning -1\n");
+    
+    def deriv(self, f, a, method = 'central', h = 1e-5):
+        """ Difference formula for f'(a) with step size h.
+
+        Parameters
+        ----------
+        f : function
+            Vectorized function of one variable
+        a : np.ndarray
+            Where to compute derivative
+        method : string, optional
+            Difference formula: 'forward', 'backward' or 'central'
+            Default is 'central'.
+        h : float, optional
+            Step size in difference formula.
+            Default is 1e-5.
+
+        Returns
+        -------
+        np.ndarray
+        """
+        if method == 'central':
+            return (f(a + h) - f(a - h))/(2*h)
+        elif method == 'forward':
+            return (f(a + h) - f(a))/h
+        elif method == 'backward':
+            return (f(a) - f(a - h))/h
+        else:
+            raise ValueError("Method must be 'central', 'forward' or 'backward'.")
+
+    def Ddot(self, z = None):
+        # Numerically calculate
+        # DERIVATIVE of the linear growth of perturbations
+        if z is None:
+            z = self.z
+        return self.deriv(self.D, z)
 
     def delta_c(self, z = None):
         if z is None:
